@@ -1,0 +1,13 @@
+"VertexlitGeneric"
+{
+	"$model"				"1"
+	"$baseTexture"			"debris/debris4"
+	"$bumpmap"				"debris/debris4_n"
+
+	"$halflambert"			"1"
+	
+	"$phong"				"1"
+ 	"$phongexponent"		"10"
+ 	"$phongboost"			"0.1"
+ 	"$phongfresnelranges"	"[0 0.5 1]"
+}
