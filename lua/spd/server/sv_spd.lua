@@ -1,0 +1,239 @@
+local spd = spd or {}
+local coltbl = coltbl or {}
+
+function spdEntityRemoved(ent)
+	
+	spd[ent:EntIndex()] = nil
+	coltbl[ent:EntIndex()] = nil
+	
+end
+
+hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
+
+function spdEntityTakeDamage(ent, dmg)
+
+	if GetConVar("spd_enabled"):GetInt() == 0 then
+		return
+	end
+	
+	if ent:GetClass() ~= "prop_physics" then
+		return
+	end
+	
+	if GetConVar("spd_physicsdamage"):GetInt() == 0 and dmg:IsDamageType(DMG_CRUSH) then
+		return
+	end
+	
+	if GetConVar("spd_bulletdamage"):GetInt() == 0 and dmg:IsDamageType(DMG_BULLET) then
+		return
+	end
+	
+	if GetConVar("spd_explosiondamage"):GetInt() == 0 and dmg:IsDamageType(DMG_BLAST) then
+		return
+	end
+	
+	local entPhysObj = ent:GetPhysicsObject()
+	local entIndex = ent:EntIndex()
+	
+	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] == nil and ent:Health() == 0 then
+	
+		local spdHealth = spdGetMaxHealth(ent)
+		
+		spd[entIndex] = spdHealth
+		coltbl[entIndex] = ent:GetColor()
+		
+	end
+	
+	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] then
+	
+		spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar("spd_prophealth"):GetInt()
+		
+		local spdMaxHealth = spdGetMaxHealth(ent)
+		
+		if GetConVar("spd_color"):GetInt() ~= 0 then
+		
+			local entHealthPercent = spd[entIndex] / spdMaxHealth
+			local entR = coltbl[entIndex].r
+			local entG = coltbl[entIndex].g
+			local entB = coltbl[entIndex].b
+			local fadeR = GetConVar("spd_colorfade_r"):GetInt()
+			local fadeG = GetConVar("spd_colorfade_g"):GetInt()
+			local fadeB = GetConVar("spd_colorfade_b"):GetInt()
+			local newR = Lerp(entHealthPercent, fadeR, entR)
+			local newG = Lerp(entHealthPercent, fadeG, entG)
+			local newB = Lerp(entHealthPercent, fadeB, entB)
+			local alpha = coltbl[entIndex].a
+			local color = Color(newR, newG, newB, alpha)
+			
+			ent:SetColor(color)
+			
+		end
+		
+		if spd[entIndex] < spdMaxHealth * GetConVar("spd_unfreeze_threshold"):GetFloat() then
+		
+			if GetConVar("spd_effects"):GetInt() ~= 0 then
+			
+				local effect = EffectData()
+				local dmgPos = dmg:GetDamagePosition()
+				effect:SetStart(dmgPos)
+				effect:SetOrigin(dmgPos)
+				util.Effect(cvars.String("spd_effect"), effect)
+				
+			end
+			
+			if GetConVar("spd_unfreeze"):GetInt() ~= 0 then
+			
+				entPhysObj:EnableMotion(true)
+				
+			end
+			
+		end
+		
+		if spd[entIndex] < spdMaxHealth * GetConVar("spd_removeconstraints_threshold"):GetFloat() then
+		
+			if GetConVar("spd_effects"):GetInt() ~= 0 then
+			
+				local effect = EffectData()
+				local dmgPos = dmg:GetDamagePosition()
+				effect:SetStart(dmgPos)
+				effect:SetOrigin(dmgPos)
+				util.Effect(cvars.String("spd_effect2"), effect)
+				
+			end
+			
+			if GetConVarNumber("spd_removeconstraints") ~= 0 then
+			
+				constraint.RemoveAll(ent)
+				
+			end
+			
+		end
+		
+		if spd[entIndex] <= 0 then
+		
+			if GetConVar("spd_explosion"):GetInt() ~= 0 then
+			
+				local effect = EffectData()
+				local entPos = ent:WorldSpaceCenter()
+				effect:SetStart(entPos)
+				effect:SetOrigin(entPos)
+				util.Effect(cvars.String("spd_explosion_effect"), effect)
+				
+			end
+			
+			spdDebris(ent)
+			
+			SafeRemoveEntity(ent)
+			
+		end
+		
+	end
+	
+end
+
+hook.Add("EntityTakeDamage", "spdEntityTakeDamageHook", spdEntityTakeDamage)
+
+function spdDebris(ent)
+
+	if GetConVar("spd_debris"):GetInt() == 0 then
+		return
+	end
+	
+	if IsValid(ent) and not ent.spdDestroyed then
+	
+		ent.spdDestroyed = true
+		
+		local debris = ents.Create("base_gmodentity")
+		local mat = "debris/debris" .. tostring(math.random(1, 4))
+		
+		debris:SetPos(ent:GetPos())
+		debris:SetAngles(ent:GetAngles())
+		debris:SetModel(ent:GetModel())
+		debris:SetMaterial(mat, false)
+		debris:SetCollisionGroup(COLLISION_GROUP_WORLD)
+		debris:PhysicsInit(SOLID_VPHYSICS)
+		
+		local physobj = debris:GetPhysicsObject()
+		--local force = spdGetMaxHealth(ent) * 4
+		local force = 1000
+		
+		physobj:AddVelocity(Vector(math.random(-force, force), math.random(-force, force), math.random(-force, force)))
+		physobj:AddAngleVelocity(Vector(math.random(-force, force), math.random(-force, force), math.random(-force, force)))
+		
+		timer.Simple(10, function()
+		
+			if IsValid(debris) then
+			
+				local effect = EffectData()
+				local debrisPos = debris:GetPos()
+				effect:SetStart(debrisPos)
+				effect:SetOrigin(debrisPos)
+				effect:SetEntity(debris)
+				util.Effect("entity_remove", effect)
+				
+			end
+			
+			timer.Simple(engine.TickInterval(), function()
+			
+				SafeRemoveEntity(debris)
+				
+			end)
+			
+		end)
+		
+	end
+
+end
+
+function spdGetColor(ent)
+
+	return coltbl[ent:EntIndex()]
+
+end
+
+function spdEnable(ent)
+
+	if IsValid(ent) then
+	
+		ent.spdDisabled = false
+		
+	end
+
+end
+
+function spdDisable(ent)
+	
+	ent.spdDisabled = nil
+
+end
+
+function spdClear(ent)
+
+	spd[ent:EntIndex()] = nil
+	coltbl[ent:EntIndex()] = nil
+
+end
+
+function spdGetHealth(ent)
+
+	return spd[ent:EntIndex()]
+
+end
+
+function spdGetMaxHealth(ent)
+
+	return spdGetWeightHealth(ent) + spdGetVolumeHealth(ent)
+
+end
+
+function spdGetWeightHealth(ent)
+
+	return ent:GetPhysicsObject():GetMass() * GetConVar("spd_health_weightratio"):GetFloat()
+
+end
+
+function spdGetVolumeHealth(ent)
+
+	return ent:GetPhysicsObject():GetVolume() / 500 * GetConVar("spd_health_volumeratio"):GetFloat()
+
+end

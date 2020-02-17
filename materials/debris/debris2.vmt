@@ -1,0 +1,13 @@
+"VertexLitGeneric"
+{
+	"$model"				"1"
+	"$baseTexture"			"debris/debris2"
+	"$bumpmap"				"debris/debris2_n"
+
+	"$halflambert"			"1"
+
+	"$phong"				"1"
+	"$phongexponent"		"10"
+	"$phongboost"			"0.05"
+	"$phongfresnelranges"	"[0.25 1 4]"
+}
