@@ -11,11 +11,14 @@ end
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
 function spdEntityTakeDamage(ent, dmg)
-
 	if GetConVar("spd_enabled"):GetInt() == 0 then
 		return
 	end
 	
+	if ent:CPPIGetOwner():GetNWBool( "CFC_PvP_Mode", false ) then
+		return
+	end
+
 	if ent:GetClass() ~= "prop_physics" then
 		return
 	end
