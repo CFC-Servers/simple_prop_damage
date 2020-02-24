@@ -16,9 +16,7 @@ function spdEntityTakeDamage(ent, dmg)
 	if not IsValid( entOwner ) then
 		return
 	end
-
-	local ownerInBuild = not ent:CPPIGetOwner():GetNWBool( "CFC_PvP_Mode", false )
-
+	
 	if GetConVar("spd_enabled"):GetInt() == 0 then
 		return
 	end
