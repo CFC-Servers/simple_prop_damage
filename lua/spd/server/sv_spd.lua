@@ -39,11 +39,10 @@ function spdEntityTakeDamage(ent, dmg)
 	
 	local entPhysObj = ent:GetPhysicsObject()
 	local entIndex = ent:EntIndex()
-	local ownerInBuild = not entOwner:GetNWBool( "CFC_PvP_Mode", false )
 
-	if ownerInBuild then
-		return
-	end
+	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
+
+	if shouldDamage == false then return end
 	
 	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] == nil and ent:Health() == 0 then
 	
