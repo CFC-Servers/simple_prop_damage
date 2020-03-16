@@ -23,7 +23,7 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
-	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetInt()
+	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
 
 	    if physicsDamage == 0 then return end
 
@@ -31,7 +31,7 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 
 	if dmg:IsDamageType( DMG_BULLET ) then
-	    local bulletDamage = GetConVar( "spd_bulletdamage" ):GetInt()
+	    local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
 
 	    if bulletDamage == 0 then return end
 
@@ -39,7 +39,7 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 
 	if dmg:IsDamageType( DMG_BLAST ) then
-        local explosionDamage = GetConVar("spd_explosiondamage"):GetInt()
+        local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
 
         if explosionDamage == 0 then return end
 
@@ -130,7 +130,7 @@ local function spdEntityTakeDamage(ent, dmg)
 		
 		if spd[entIndex] <= 0 then
 		
-			if GetConVar("spd_explosion"):GetInt() ~= 0 then
+			if GetConVar("spd_explosion"):GetFloat() ~= 0 then
 			
 				local effect = EffectData()
 				local entPos = ent:WorldSpaceCenter()
