@@ -1,22 +1,19 @@
 local spd = spd or {}
 local coltbl = coltbl or {}
 
-function spdEntityRemoved(ent)
-	
+local function spdEntityRemoved(ent)
 	spd[ent:EntIndex()] = nil
 	coltbl[ent:EntIndex()] = nil
-	
 end
-
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
-function spdEntityTakeDamage(ent, dmg)
+local function spdEntityTakeDamage(ent, dmg)
 	local entOwner = ent:CPPIGetOwner()
 
 	if not IsValid( entOwner ) then
 		return
 	end
-	
+
 	if GetConVar("spd_enabled"):GetInt() == 0 then
 		return
 	end
@@ -24,28 +21,39 @@ function spdEntityTakeDamage(ent, dmg)
 	if ent:GetClass() ~= "prop_physics" then
 		return
 	end
-	
-	if GetConVar("spd_physicsdamage"):GetInt() == 0 and dmg:IsDamageType(DMG_CRUSH) then
-		return
+
+	if dmg:IsDamageType( DMG_CRUSH ) then
+	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
+
+	    if physicsDamage == 0 then return end
+
+	    dmg:ScaleDamage( physicsDamage )
 	end
-	
-	if GetConVar("spd_bulletdamage"):GetInt() == 0 and dmg:IsDamageType(DMG_BULLET) then
-		return
+
+	if dmg:IsDamageType( DMG_BULLET ) then
+	    local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
+
+	    if bulletDamage == 0 then return end
+
+	    dmg:ScaleDamage( bulletDamage )
 	end
-	
-	if GetConVar("spd_explosiondamage"):GetInt() == 0 and dmg:IsDamageType(DMG_BLAST) then
-		return
+
+	if dmg:IsDamageType( DMG_BLAST ) then
+        local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
+
+        if explosionDamage == 0 then return end
+
+        dmg:ScaleDamage( explosionDamage )
 	end
-	
+
 	local entPhysObj = ent:GetPhysicsObject()
 	local entIndex = ent:EntIndex()
 
 	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
-
 	if shouldDamage == false then return end
-	
+
 	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] == nil and ent:Health() == 0 then
-	
+
 		local spdHealth = spdGetMaxHealth(ent)
 		
 		spd[entIndex] = spdHealth
@@ -120,7 +128,7 @@ function spdEntityTakeDamage(ent, dmg)
 		
 		if spd[entIndex] <= 0 then
 		
-			if GetConVar("spd_explosion"):GetInt() ~= 0 then
+			if GetConVar("spd_explosion"):GetFloat() ~= 0 then
 			
 				local effect = EffectData()
 				local entPos = ent:WorldSpaceCenter()
