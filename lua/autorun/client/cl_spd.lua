@@ -48,7 +48,7 @@ local function PopulateSPDMainPanel(panel)
 			[16] = "spd_colorfade_g",
 			[17] = "spd_colorfade_b",
 			[18] = "spd_debris",
-            [19] = "spd_meleedamage"
+                        [19] = "spd_meleedamage"
 		}
 	})
 	
