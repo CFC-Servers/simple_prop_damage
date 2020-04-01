@@ -23,35 +23,35 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
-		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
+	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
 
-		if physicsDamage == 0 then return end
+	    if physicsDamage == 0 then return end
 
-		dmg:ScaleDamage( physicsDamage )
+	    dmg:ScaleDamage( physicsDamage )
 	end
 
 	if dmg:IsDamageType( DMG_BULLET ) then
-		local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
+	    local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
 
-		if bulletDamage == 0 then return end
+	    if bulletDamage == 0 then return end
 
-		dmg:ScaleDamage( bulletDamage )
+	    dmg:ScaleDamage( bulletDamage )
 	end
 
 	if dmg:IsDamageType( DMG_BLAST ) then
-		local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
+        local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
 
-		if explosionDamage == 0 then return end
+        if explosionDamage == 0 then return end
 
-		dmg:ScaleDamage( explosionDamage )
+        dmg:ScaleDamage( explosionDamage )
 	end
 
 	if dmg:IsDamageType( DMG_CLUB ) then
-		local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
+        local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
 
-		if meleeDamage == 0 then return end
+        if meleeDamage == 0 then return end
 
-		dmg:ScaleDamage( meleeDamage )
+        dmg:ScaleDamage( meleeDamage )
 	end
 
 	local entPhysObj = ent:GetPhysicsObject()
