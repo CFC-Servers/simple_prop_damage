@@ -25,7 +25,7 @@ local function PopulateSPDMainPanel(panel)
 				spd_colorfade_g = 0,
 				spd_colorfade_b = 0,
 				spd_debris = 1,
-				spd_meleedamage = 1
+                spd_meleedamage = 1
 			}
 		},
 		CVars = {
@@ -48,36 +48,36 @@ local function PopulateSPDMainPanel(panel)
 			[16] = "spd_colorfade_g",
 			[17] = "spd_colorfade_b",
 			[18] = "spd_debris",
-			[19] = "spd_meleedamage"
+            [19] = "spd_meleedamage"
 		}
 	})
 	
 	panel:AddControl("CheckBox", {
-		Label = "Enabled",
-		Command = "spd_enabled",
-	});
+        Label = "Enabled",
+        Command = "spd_enabled",
+    });
 	
 	panel:AddControl("Label", {
-		Text = "Prop Health Multiplier: The higher this number is, the more health props will have."
-	})
+        Text = "Prop Health Multiplier: The higher this number is, the more health props will have."
+    })
 	panel:AddControl("Slider", {
-		Label = "Prop Health Multiplier",
-		Command = "spd_prophealth",
-		Type = "Integer",
-		Min = "0",
-		Max = "10",
-	})
+        Label = "Prop Health Multiplier",
+        Command = "spd_prophealth",
+        Type = "Integer",
+        Min = "0",
+        Max = "10",
+    })
 	
 	panel:AddControl("Label", {
-		Text = "Enable Color Change: Whether or not props change color as they get damaged."
-	})
+        Text = "Enable Color Change: Whether or not props change color as they get damaged."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Enable Color Change",
-		Command = "spd_color",
-	});
+        Label = "Enable Color Change",
+        Command = "spd_color",
+    });
 	panel:AddControl("Label", {
-		Text = "Fade to Color: The color that props turn when damaged."
-	})
+        Text = "Fade to Color: The color that props turn when damaged."
+    })
 	panel:AddControl("ComboBox", {
 		Label = "#Color",
 		MenuButton = "0",
@@ -99,58 +99,58 @@ local function PopulateSPDMainPanel(panel)
 	})
 	
 	panel:AddControl("Label", {
-		Text = "Enable Damage Types: Whether or not specific damage types should actually damage props."
-	})
+        Text = "Enable Damage Types: Whether or not specific damage types should actually damage props."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Enable Physics Damage",
-		Command = "spd_physicsdamage",
-	});
+        Label = "Enable Physics Damage",
+        Command = "spd_physicsdamage",
+    });
 	panel:AddControl("CheckBox", {
-		Label = "Enable Bullet Damage",
-		Command = "spd_bulletdamage",
-	});
+        Label = "Enable Bullet Damage",
+        Command = "spd_bulletdamage",
+    });
 	panel:AddControl("CheckBox", {
-		Label = "Enable Explosion Damage",
-		Command = "spd_explosiondamage",
-	});
+        Label = "Enable Explosion Damage",
+        Command = "spd_explosiondamage",
+    });
 	
 	panel:AddControl("CheckBox", {
-		Label = "Enable Unfreezing",
-		Command = "spd_unfreeze",
-	});
+        Label = "Enable Unfreezing",
+        Command = "spd_unfreeze",
+    });
 	panel:AddControl("Label", {
-		Text = "Unfreeze Threshold: The percentage of health when props unfreeze. Also creates an effect when a prop is hit below this health."
-	})
+        Text = "Unfreeze Threshold: The percentage of health when props unfreeze. Also creates an effect when a prop is hit below this health."
+    })
 	panel:AddControl("Slider", {
-		Label = "Unfreeze Threshold",
-		Command = "spd_unfreeze_threshold",
-		Type = "Float",
-		Min = "0",
-		Max = "1",
-	})
+        Label = "Unfreeze Threshold",
+        Command = "spd_unfreeze_threshold",
+        Type = "Float",
+        Min = "0",
+        Max = "1",
+    })
 	
 	panel:AddControl("CheckBox", {
-		Label = "Enable Constraint Removal",
-		Command = "spd_removeconstraints",
-	});
+        Label = "Enable Constraint Removal",
+        Command = "spd_removeconstraints",
+    });
 	panel:AddControl("Label", {
-		Text = "Constraint Removal Threshold: The percentage of health when props lose their constraints. Also creates a different effect when a prop is hit below this health."
-	})
+        Text = "Constraint Removal Threshold: The percentage of health when props lose their constraints. Also creates a different effect when a prop is hit below this health."
+    })
 	panel:AddControl("Slider", {
-		Label = "Constraint Removal Threshold",
-		Command = "spd_removeconstraints_threshold",
-		Type = "Float",
-		Min = "0",
-		Max = "1",
-	})
+        Label = "Constraint Removal Threshold",
+        Command = "spd_removeconstraints_threshold",
+        Type = "Float",
+        Min = "0",
+        Max = "1",
+    })
 	
 	panel:AddControl("Label", {
-		Text = "Enable Particle Effects: Whether or not particle effects are created when a prop is damaged when below a threshold."
-	})
+        Text = "Enable Particle Effects: Whether or not particle effects are created when a prop is damaged when below a threshold."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Enable Particle Effects",
-		Command = "spd_effects",
-	});
+        Label = "Enable Particle Effects",
+        Command = "spd_effects",
+    });
 	panel:AddControl("ComboBox", {
 		Label = "#First Effect",
 		MenuButton = "0",
@@ -189,12 +189,12 @@ local function PopulateSPDMainPanel(panel)
 	})
 	
 	panel:AddControl("Label", {
-		Text = "Enable Explosion Effect: Whether or not an explosion effect is created when a prop is destroyed."
-	})
+        Text = "Enable Explosion Effect: Whether or not an explosion effect is created when a prop is destroyed."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Enable Explosion Effect",
-		Command = "spd_explosion",
-	});
+        Label = "Enable Explosion Effect",
+        Command = "spd_explosion",
+    });
 	panel:AddControl("ComboBox", {
 		Label = "#Explosion Effect",
 		MenuButton = "0",
@@ -210,12 +210,12 @@ local function PopulateSPDMainPanel(panel)
 		}
 	})
 	panel:AddControl("Label", {
-		Text = "Enable Debris: Whether or not props should leave behind debris when they are destroyed."
-	})
+        Text = "Enable Debris: Whether or not props should leave behind debris when they are destroyed."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Enable Debris",
-		Command = "spd_debris",
-	});
+        Label = "Enable Debris",
+        Command = "spd_debris",
+    });
 end
 
 local function PopulateSPDAdvancedPanel(panel)
@@ -241,38 +241,38 @@ local function PopulateSPDAdvancedPanel(panel)
 	})
 
 	panel:AddControl("Label", {
-		Text = "Weight Ratio: The HIGHER this number is, the more base health props will have due to weight. Setting this to 0 means that weight has no effect on prop health. Use the Prop Health multiplier for large-scale tuning of prop health."
-	})
+        Text = "Weight Ratio: The HIGHER this number is, the more base health props will have due to weight. Setting this to 0 means that weight has no effect on prop health. Use the Prop Health multiplier for large-scale tuning of prop health."
+    })
 	panel:AddControl("Slider", {
-		Label = "Weight Ratio",
-		Command = "spd_health_weightratio",
-		Type = "Float",
-		Min = "0",
-		Max = "1",
-	})
+        Label = "Weight Ratio",
+        Command = "spd_health_weightratio",
+        Type = "Float",
+        Min = "0",
+        Max = "1",
+    })
 	
 	panel:AddControl("Label", {
-		Text = "Volume Ratio: The HIGHER this number is, the more base health props will have due to volume. Setting this to 0 means that volume has no effect on prop health. Use the Prop Health multiplier for large-scale tuning of prop health."
-	})
+        Text = "Volume Ratio: The HIGHER this number is, the more base health props will have due to volume. Setting this to 0 means that volume has no effect on prop health. Use the Prop Health multiplier for large-scale tuning of prop health."
+    })
 	panel:AddControl("Slider", {
-		Label = "Volume Ratio",
-		Command = "spd_health_volumeratio",
-		Type = "Float",
-		Min = "0",
-		Max = "1",
-	})
+        Label = "Volume Ratio",
+        Command = "spd_health_volumeratio",
+        Type = "Float",
+        Min = "0",
+        Max = "1",
+    })
 	
 	panel:AddControl("Label", {
-		Text = "Admin-Only Tools: Whether or not only admins can use the SPD tools."
-	})
+        Text = "Admin-Only Tools: Whether or not only admins can use the SPD tools."
+    })
 	panel:AddControl("CheckBox", {
-		Label = "Heal Tool Admin-Only",
-		Command = "spd_tool_heal_adminonly",
-	});
+        Label = "Heal Tool Admin-Only",
+        Command = "spd_tool_heal_adminonly",
+    });
 	panel:AddControl("CheckBox", {
-		Label = "Toggle Tool Admin-Only",
-		Command = "spd_tool_toggle_adminonly",
-	});
+        Label = "Toggle Tool Admin-Only",
+        Command = "spd_tool_toggle_adminonly",
+    });
 
 end
 
