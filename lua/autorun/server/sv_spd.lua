@@ -31,6 +31,7 @@ cvartbl[19] = {"spd_colorfade_r", 255}
 cvartbl[20] = {"spd_colorfade_g", 0}
 cvartbl[21] = {"spd_colorfade_b", 0}
 cvartbl[22] = {"spd_debris", 1}
+cvartbl[23] = {"spd_meleedamage", 1}
 
 for i=1, #cvartbl do
 

@@ -46,6 +46,14 @@ local function spdEntityTakeDamage(ent, dmg)
         dmg:ScaleDamage( explosionDamage )
 	end
 
+	if dmg:IsDamageType( DMG_CLUB ) then
+        local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
+
+        if meleeDamage == 0 then return end
+
+        dmg:ScaleDamage( meleeDamage )
+	end
+
 	local entPhysObj = ent:GetPhysicsObject()
 	local entIndex = ent:EntIndex()
 

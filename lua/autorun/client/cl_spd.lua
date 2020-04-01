@@ -24,7 +24,8 @@ local function PopulateSPDMainPanel(panel)
 				spd_colorfade_r = 255,
 				spd_colorfade_g = 0,
 				spd_colorfade_b = 0,
-				spd_debris = 1
+				spd_debris = 1,
+                spd_meleedamage = 1
 			}
 		},
 		CVars = {
@@ -46,7 +47,8 @@ local function PopulateSPDMainPanel(panel)
 			[15] = "spd_colorfade_r",
 			[16] = "spd_colorfade_g",
 			[17] = "spd_colorfade_b",
-			[18] = "spd_debris"
+			[18] = "spd_debris",
+            [19] = "spd_meleedamage"
 		}
 	})
 	
