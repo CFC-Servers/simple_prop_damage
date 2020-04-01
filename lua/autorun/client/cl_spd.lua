@@ -25,7 +25,7 @@ local function PopulateSPDMainPanel(panel)
 				spd_colorfade_g = 0,
 				spd_colorfade_b = 0,
 				spd_debris = 1,
-                spd_meleedamage = 1
+                                spd_meleedamage = 1
 			}
 		},
 		CVars = {
