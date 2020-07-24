@@ -12,6 +12,20 @@ function isSPDAffectedEntity(ent)
     return false
 end
 
+local function isInLineOfSight(sVector,ent)
+    local losTraceData = {}
+    if not isvector(sVector) then return false end
+    local entPosition = ent:GetPos() or Vector(0,0,0)
+    losTraceData["start"] = sVector
+    losTraceData["endpos"] = entPosition
+    losTraceData["filter"] = ent
+    local losTrace = util.TraceLine(losTraceData)
+    if not losTrace[Hit] then
+        return true
+    end
+    return false
+end
+
 
 local function spdEntityRemoved(ent)
 	spd[ent:EntIndex()] = nil
