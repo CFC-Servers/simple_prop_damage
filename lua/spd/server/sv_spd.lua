@@ -65,7 +65,8 @@ local function spdEntityTakeDamage(ent, dmg)
         return
     end
     
-    if IsSPDAffectedLOSEntity( ent ) and not isInLineOfSight( dmg:GetDamagePosition(), ent ) then
+    local condForSpecial = not isInLineOfSight( dmg:GetDamagePosition(), ent ) and dmg:IsDamageType( DMG_BLAST )
+    if IsSPDAffectedLOSEntity( ent ) and condForSpecial then
         return
     end
     
