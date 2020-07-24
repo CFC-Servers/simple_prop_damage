@@ -30,9 +30,9 @@ local function spdEntityTakeDamage(ent, dmg)
 		return
 	end
 
-    if not isSPDAffectedEntity(ent) then
-        return
-    end
+	if not isSPDAffectedEntity(ent) then
+		return
+	end
     
 	if dmg:IsDamageType( DMG_CRUSH ) then
 	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
