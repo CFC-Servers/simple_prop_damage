@@ -61,11 +61,11 @@ local function spdEntityTakeDamage(ent, dmg)
         return
     end
 
-    if not isSPDAffectedEntity( ent ) then
+    if not IsSPDAffectedEntity( ent ) then
         return
     end
     
-    if isSPDAffectedLOSEntity( ent ) and not isInLineOfSight( dmg:GetDamagePosition(), ent ) then
+    if IsSPDAffectedLOSEntity( ent ) and not isInLineOfSight( dmg:GetDamagePosition(), ent ) then
         return
     end
     
