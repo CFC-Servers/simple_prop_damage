@@ -52,7 +52,6 @@ hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
 local function spdEntityTakeDamage(ent, dmg)
     local entOwner = ent:CPPIGetOwner()
-    print(dmg)
 
     if not IsValid( entOwner ) then
         return
@@ -110,22 +109,18 @@ local function spdEntityTakeDamage(ent, dmg)
     if shouldDamage == false then return end
 
     if IsValid( ent ) and IsValid( entPhysObj ) and spd[entIndex] == nil and ent:Health() == 0 then
-
         local spdHealth = spdGetMaxHealth( ent )
         
         spd[entIndex] = spdHealth
         coltbl[entIndex] = ent:GetColor()
-        
     end
     
     if IsValid( ent ) and IsValid( entPhysObj ) and spd[entIndex] then
-        
         spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar( "spd_prophealth" ):GetInt()
         
         local spdMaxHealth = spdGetMaxHealth( ent )
         
         if GetConVar( "spd_color" ):GetInt() ~= 0 then
-        
             local entHealthPercent = spd[entIndex] / spdMaxHealth
             
             local entR = coltbl[ entIndex ].r
@@ -145,33 +140,24 @@ local function spdEntityTakeDamage(ent, dmg)
             local color = Color( newR, newG, newB, alpha )
             
             ent:SetColor( color )
-            
         end
         
         if spd[entIndex] < spdMaxHealth * GetConVar( "spd_unfreeze_threshold" ):GetFloat() then
-        
             if GetConVar( "spd_effects" ):GetInt() ~= 0 then
-            
                 local effect = EffectData()
                 local dmgPos = dmg:GetDamagePosition()
                 effect:SetStart( dmgPos )
                 effect:SetOrigin( dmgPos )
                 util.Effect( cvars.String( "spd_effect" ), effect )
-                
             end
             
             if GetConVar( "spd_unfreeze" ):GetInt() ~= 0 then
-            
-                entPhysObj:EnableMotion( true )
-                
+                entPhysObj:EnableMotion( true ) 
             end
-            
         end
         
         if spd[entIndex] < spdMaxHealth * GetConVar( "spd_removeconstraints_threshold" ):GetFloat() then
-        
             if GetConVar( "spd_effects" ):GetInt() ~= 0 then
-            
                 local effect = EffectData()
                 local dmgPos = dmg:GetDamagePosition()
                 
@@ -179,21 +165,15 @@ local function spdEntityTakeDamage(ent, dmg)
                 effect:SetOrigin( dmgPos )
                 
                 util.Effect( cvars.String( "spd_effect2" ), effect )
-                
             end
             
             if GetConVarNumber( "spd_removeconstraints" ) ~= 0 then
-            
-                constraint.RemoveAll( ent )
-                
+                constraint.RemoveAll( ent ) 
             end
-            
         end
         
         if spd[entIndex] <= 0 then
-        
             if GetConVar( "spd_explosion" ):GetFloat() ~= 0 then
-            
                 local effect = EffectData()
                 local entPos = ent:WorldSpaceCenter()
                 
@@ -201,29 +181,23 @@ local function spdEntityTakeDamage(ent, dmg)
                 effect:SetOrigin( entPos )
                 
                 util.Effect( cvars.String( "spd_explosion_effect" ), effect )
-                
             end
             
             spdDebris( ent )
             
-            SafeRemoveEntity( ent )
-            
+            SafeRemoveEntity( ent ) 
         end
-        
     end
-    
 end
 
 hook.Add( "EntityTakeDamage", "spdEntityTakeDamageHook", spdEntityTakeDamage )
 
 function spdDebris( ent )
-
     if GetConVar( "spd_debris" ):GetInt() == 0 then
         return
     end
     
     if IsValid( ent ) and not ent.spdDestroyed then
-    
         ent.spdDestroyed = true
         
         local debris = ents.Create( "base_gmodentity" )
@@ -247,9 +221,7 @@ function spdDebris( ent )
         physobj:AddAngleVelocity( velVector )
         
         timer.Simple( 10, function()
-        
             if IsValid( debris ) then
-            
                 local effect = EffectData()
                 local debrisPos = debris:GetPos()
                 
@@ -258,70 +230,46 @@ function spdDebris( ent )
                 effect:SetEntity( debris )
 
                 util.Effect( "entity_remove", effect )
-                
             end
             
             timer.Simple( engine.TickInterval(), function()
-            
                 SafeRemoveEntity( debris )
-                
             end)
-            
         end)
-        
     end
-
 end
 
 function spdGetColor( ent )
-
     return coltbl[ent:EntIndex()]
-
 end
 
 function spdEnable( ent )
-
     if IsValid( ent ) then
-    
         ent.spdDisabled = false
-        
     end
-
 end
 
 function spdDisable( ent )
-    
     ent.spdDisabled = nil
-
 end
 
 function spdClear( ent )
-
     spd[ent:EntIndex()] = nil
     coltbl[ent:EntIndex()] = nil
-
 end
 
 function spdGetHealth( ent )
-
     return spd[ent:EntIndex()]
-
 end
 
 function spdGetMaxHealth( ent )
-
     return spdGetWeightHealth( ent ) + spdGetVolumeHealth( ent )
-
 end
 
 function spdGetWeightHealth( ent )
-
     return ent:GetPhysicsObject():GetMass() * GetConVar( "spd_health_weightratio" ):GetFloat()
-
 end
 
 function spdGetVolumeHealth( ent )
-
     return ent:GetPhysicsObject():GetVolume() / 500 * GetConVar( "spd_health_volumeratio" ):GetFloat()
-
 end
