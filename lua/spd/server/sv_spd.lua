@@ -3,8 +3,15 @@ local coltbl = coltbl or {}
 
 local affectedEnts = {}
 affectedEnts["prop_physics"] = true
-affectedEnts["gmod_wire"] = true -- gmod_wire_* --maybe i should use the first two words betweeen underlines
-affectedEnts["gmod_prisoner"] = true --gmod_prisoner_pod
+affectedEnts["gmod_prisoner_pod"] = true 
+
+function isSPDAffectedEntity(ent)
+    if affectedEnts[ent:GetClass()] or WireLib.HasPorts(ent) or ent.IsWire then
+        return true        
+    end
+    return false
+end
+
 
 local function spdEntityRemoved(ent)
 	spd[ent:EntIndex()] = nil
@@ -23,15 +30,8 @@ local function spdEntityTakeDamage(ent, dmg)
 		return
 	end
 
--- 	if ent:GetClass() ~= "prop_physics" then
--- 		return
--- 	end
-    do
-        local splitClassName = Explode("_",ent:GetClass())
-        local unsplitFirstTwo = splitClassName[1] .. "_" .. splitClassName[2]
-        if not affectedEnts[unsplitFirstTwo] then
-            return
-        end
+    if not isSPDAffectedEntity(ent) then
+        return
     end
     
 	if dmg:IsDamageType( DMG_CRUSH ) then
