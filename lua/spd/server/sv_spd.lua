@@ -52,6 +52,7 @@ hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
 local function spdEntityTakeDamage(ent, dmg)
     local entOwner = ent:CPPIGetOwner()
+    print(dmg)
 
     if not IsValid( entOwner ) then
         return
