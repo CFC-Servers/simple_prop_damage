@@ -12,6 +12,13 @@ function isSPDAffectedEntity(ent)
     return false
 end
 
+function isSPDAffectedLOSEntity(ent)
+    if ent:GetClass() == "gmod_prisoner_pod" or WireLib.HasPorts(ent) or ent.IsWire then
+        return true        
+    end
+    return false
+end
+
 local function isInLineOfSight(sVector,ent)
     local losTraceData = {}
     if not isvector(sVector) then return false end
@@ -47,6 +54,10 @@ local function spdEntityTakeDamage(ent, dmg)
 	if not isSPDAffectedEntity(ent) then
 		return
 	end
+    
+    if isSPDAffectedLOSEntity(ent) and not isInLineOfSight(dmg:GetDamagePosition(),ent) then
+        return
+    end
     
 	if dmg:IsDamageType( DMG_CRUSH ) then
 	    local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
@@ -96,7 +107,7 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 	
 	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] then
-	
+        
 		spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar("spd_prophealth"):GetInt()
 		
 		local spdMaxHealth = spdGetMaxHealth(ent)
