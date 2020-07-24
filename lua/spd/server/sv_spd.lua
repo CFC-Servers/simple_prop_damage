@@ -36,7 +36,7 @@ local function isInLineOfSight( sVector, ent )
     losTraceData["filter"] = ent
     
     local losTrace = util.TraceLine( losTraceData )
-    if not losTrace[Hit] then
+    if not losTrace.Hit then
         
         return true
     end
