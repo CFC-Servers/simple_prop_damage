@@ -3,7 +3,7 @@ local coltbl = coltbl or {}
 
 local affectedEnts = {}
 affectedEnts["prop_physics"] = true
-affectedEnts["gmod_prisoner_pod"] = true 
+affectedEnts["prop_vehicle_prisoner_pod"] = true 
 
 
 function IsSPDAffectedEntity( ent )
@@ -16,7 +16,7 @@ function IsSPDAffectedEntity( ent )
 end
 
 function IsSPDAffectedLOSEntity( ent )
-    if ent:GetClass() == "gmod_prisoner_pod" or WireLib.HasPorts( ent ) or ent.IsWire then
+    if ent:GetClass() == "prop_vehicle_prisoner_pod" or WireLib.HasPorts( ent ) or ent.IsWire then
         
         return true        
     end
