@@ -1,13 +1,14 @@
 local spd = spd or {}
 local coltbl = coltbl or {}
 
-local affectedEnts = {
-    "prop_physics" = true,
-    "prop_vehicle_prisoner_pod" = true 
-}
+local affectedEnts = {}
+affectedEnts["prop_physics"] = true
+affectedEnts["prop_vehicle_prisoner_pod"] = true 
+
 
 function IsSPDAffectedEntity( ent )
     if affectedEnts[ent:GetClass()] or WireLib.HasPorts( ent ) or ent.IsWire then
+        
         return true        
     end
     
@@ -16,6 +17,7 @@ end
 
 function IsSPDAffectedLOSEntity( ent )
     if ent:GetClass() == "prop_vehicle_prisoner_pod" or WireLib.HasPorts( ent ) or ent.IsWire then
+        
         return true        
     end
     
@@ -23,18 +25,21 @@ function IsSPDAffectedLOSEntity( ent )
 end
 
 
-local function isInLineOfSight( sVector, ent )
-    if not isvector( sVector ) then return false end
+local function isInLineOfSight( startVector, ent, damageObject )
+    if not isvector( startVector ) then return false end
+    if not damageObject:IsDamageType( DMG_BLAST ) then return false end
     
-    local entPosition = ent:GetPos() or Vector( 0, 0, 0 )
+    local entPosition = ent:GetPos()
     
-    local losTraceData = {}
-    losTraceData["start"] = sVector
-    losTraceData["endpos"] = entPosition
-    losTraceData["filter"] = ent
+    local losTraceData = {
+        "start" = startVector,
+        "endpos" = entPosition,
+        "filter" = ent
+    }
     
     local losTrace = util.TraceLine( losTraceData )
     if not losTrace.Hit then
+        
         return true
     end
     
@@ -62,7 +67,7 @@ local function spdEntityTakeDamage(ent, dmg)
         return
     end
     
-    local condForSpecial = not isInLineOfSight( dmg:GetDamagePosition(), ent ) and dmg:IsDamageType( DMG_BLAST )
+    local condForSpecial = not isInLineOfSight( dmg:GetDamagePosition(), ent, dmg )
     if IsSPDAffectedLOSEntity( ent ) and condForSpecial then
         return
     end
