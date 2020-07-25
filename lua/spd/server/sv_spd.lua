@@ -1,10 +1,10 @@
 local spd = spd or {}
 local coltbl = coltbl or {}
 
-local affectedEnts = {}
-affectedEnts["prop_physics"] = true
-affectedEnts["prop_vehicle_prisoner_pod"] = true 
-
+local affectedEnts = {
+    "prop_physics" = true,
+    "prop_vehicle_prisoner_pod" = true 
+}
 
 function IsSPDAffectedEntity( ent )
     if affectedEnts[ent:GetClass()] or WireLib.HasPorts( ent ) or ent.IsWire then
