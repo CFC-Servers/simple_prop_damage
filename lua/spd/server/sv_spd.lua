@@ -27,7 +27,7 @@ end
 
 local function isInLineOfSight( startVector, ent, damageObject )
     if not isvector( startVector ) then return false end
-    if not damageObject:IsDamageType( DMG_BLAST ) then return false end
+    if not damageObject:IsDamageType( DMG_BLAST ) then return true end
     
     local entPosition = ent:GetPos()
     
