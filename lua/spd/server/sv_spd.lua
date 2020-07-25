@@ -8,7 +8,6 @@ local affectedEnts = {
 
 function IsSPDAffectedEntity( ent )
     if affectedEnts[ent:GetClass()] or WireLib.HasPorts( ent ) or ent.IsWire then
-        
         return true        
     end
     
@@ -17,7 +16,6 @@ end
 
 function IsSPDAffectedLOSEntity( ent )
     if ent:GetClass() == "prop_vehicle_prisoner_pod" or WireLib.HasPorts( ent ) or ent.IsWire then
-        
         return true        
     end
     
@@ -37,7 +35,6 @@ local function isInLineOfSight( sVector, ent )
     
     local losTrace = util.TraceLine( losTraceData )
     if not losTrace.Hit then
-        
         return true
     end
     
