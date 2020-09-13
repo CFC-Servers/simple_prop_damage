@@ -24,7 +24,10 @@ function TOOL:LeftClick(trace)
 	local owner = self:GetOwner()
 	local ent = trace.Entity
 	
-	if GetConVar("spd_tool_heal_adminonly"):GetInt() ~= 0 and owner:IsAdmin() == false then
+	local adminOnly = GetConVar("spd_tool_heal_adminonly")
+	adminOnly = adminOnly and adminOnly:GetInt() ~= 0
+
+	if adminOnly and owner:IsAdmin() == false then
 	
 		if CLIENT then
 		
