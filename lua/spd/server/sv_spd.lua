@@ -252,7 +252,7 @@ end
 function spdGetMaxHealth(ent)
 
 	local maxHealth = spdGetWeightHealth(ent) + spdGetVolumeHealth(ent)
-	local clampedHealth = math.Clamp( maxHealth, 0, GetConVar("spd_health_max"):GetFloat() )
+	local clampedHealth = math.Clamp( maxHealth, 0, GetConVar("spd_health_max"):GetInt() )
 
 	return clampedHealth
 end
