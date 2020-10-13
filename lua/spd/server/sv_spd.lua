@@ -39,23 +39,27 @@ local function spdEntityTakeDamage(ent, dmg)
 	end
 
 	if dmg:IsDamageType( DMG_BLAST ) then
-        local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
+            local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
 
-        if explosionDamage == 0 then return end
+            if explosionDamage == 0 then return end
 
-        dmg:ScaleDamage( explosionDamage )
+            dmg:ScaleDamage( explosionDamage )
 	end
 
 	if dmg:IsDamageType( DMG_CLUB ) then
-        local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
+            local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
 
-        if meleeDamage == 0 then return end
+            if meleeDamage == 0 then return end
 
-        dmg:ScaleDamage( meleeDamage )
+            dmg:ScaleDamage( meleeDamage )
 	end
 
 	local entPhysObj = ent:GetPhysicsObject()
 	local entIndex = ent:EntIndex()
+	
+        if entPhysObj:IsAsleep() then
+            dmg:ScaleDamage( GetConVar("spd_frozenmodifier"):Getfloat() )
+        end
 
 	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
 	if shouldDamage == false then return end
@@ -247,8 +251,10 @@ end
 
 function spdGetMaxHealth(ent)
 
-	return spdGetWeightHealth(ent) + spdGetVolumeHealth(ent)
-
+	local maxHealth = spdGetWeightHealth(ent) + spdGetVolumeHealth(ent)
+	local clampedHealth = math.Clamp( maxHealth, 0, GetConVar("spd_health_max"):GetFloat() )
+	
+	return clampedHealth
 end
 
 function spdGetWeightHealth(ent)
