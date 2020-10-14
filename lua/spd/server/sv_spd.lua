@@ -10,17 +10,10 @@ hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 local function spdEntityTakeDamage(ent, dmg)
 	local entOwner = ent:CPPIGetOwner()
 
-	if not IsValid( entOwner ) then
-		return
-	end
-
-	if GetConVar("spd_enabled"):GetInt() == 0 then
-		return
-	end
-
-	if ent:GetClass() ~= "prop_physics" then
-		return
-	end
+	if not IsValid( entOwner ) then return end
+	if not IsValid( ent ) then return end
+	if GetConVar("spd_enabled"):GetInt() == 0 then return end
+	if ent:GetClass() ~= "prop_physics" then return end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
 		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
@@ -57,6 +50,8 @@ local function spdEntityTakeDamage(ent, dmg)
 	local entPhysObj = ent:GetPhysicsObject()
 	local entIndex = ent:EntIndex()
 
+	if not IsValid( entPhysObj ) then return end
+
 	if entPhysObj:IsAsleep() then
 		dmg:ScaleDamage( GetConVar("spd_frozenmodifier"):GetFloat() )
 	end
@@ -64,7 +59,7 @@ local function spdEntityTakeDamage(ent, dmg)
 	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
 	if shouldDamage == false then return end
 
-	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] == nil and ent:Health() == 0 then
+	if spd[entIndex] == nil and ent:Health() == 0 then
 
 		local spdHealth = spdGetMaxHealth(ent)
 
@@ -73,7 +68,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 	end
 
-	if IsValid(ent) and IsValid(entPhysObj) and spd[entIndex] then
+	if spd[entIndex] then
 
 		spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar("spd_prophealth"):GetInt()
 
