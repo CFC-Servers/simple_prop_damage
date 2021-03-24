@@ -15,12 +15,15 @@ local function spdEntityTakeDamage(ent, dmg)
 	if GetConVar("spd_enabled"):GetInt() == 0 then return end
 	if ent:GetClass() ~= "prop_physics" then return end
 
+	local dmgAmount = dmg:GetDamage()
+	local dmgAmountOld = dmgAmount
+
 	if dmg:IsDamageType( DMG_CRUSH ) then
 		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
 
 		if physicsDamage == 0 then return end
 
-		dmg:ScaleDamage( physicsDamage )
+		dmgAmount = dmgAmount * physicsDamage
 	end
 
 	if dmg:IsDamageType( DMG_BULLET ) then
@@ -28,7 +31,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 		if bulletDamage == 0 then return end
 
-		dmg:ScaleDamage( bulletDamage )
+		dmgAmount = dmgAmount * bulletDamage
 	end
 
 	if dmg:IsDamageType( DMG_BLAST ) then
@@ -36,7 +39,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 		if explosionDamage == 0 then return end
 
-		dmg:ScaleDamage( explosionDamage )
+		dmgAmount = dmgAmount * explosionDamage
 	end
 
 	if dmg:IsDamageType( DMG_CLUB ) then
@@ -44,7 +47,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 		if meleeDamage == 0 then return end
 
-		dmg:ScaleDamage( meleeDamage )
+		dmgAmount = dmgAmount * meleeDamage
 	end
 
 	local entPhysObj = ent:GetPhysicsObject()
@@ -53,10 +56,13 @@ local function spdEntityTakeDamage(ent, dmg)
 	if not IsValid( entPhysObj ) then return end
 
 	if entPhysObj:IsAsleep() then
-		dmg:ScaleDamage( GetConVar("spd_frozenmodifier"):GetFloat() )
+		dmgAmount = dmgAmount * GetConVar("spd_frozenmodifier"):GetFloat()
 	end
 
+	dmg:SetDamage( dmgAmount )
 	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
+	dmg:SetDamage( dmgAmountOld )
+
 	if shouldDamage == false then return end
 
 	if spd[entIndex] == nil and ent:Health() == 0 then
@@ -70,7 +76,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 	if spd[entIndex] then
 
-		spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar("spd_prophealth"):GetInt()
+		spd[entIndex] = spd[entIndex] - dmgAmount / GetConVar("spd_prophealth"):GetInt()
 
 		local spdMaxHealth = spdGetMaxHealth(ent)
 
