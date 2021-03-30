@@ -8,12 +8,12 @@ end
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
 local function spdEntityTakeDamage(ent, dmg)
-	local entOwner = ent:CPPIGetOwner()
-
-	if not IsValid( entOwner ) then return end
 	if not IsValid( ent ) then return end
+
+	local entOwner = ent:CPPIGetOwner()
+	if not IsValid( entOwner ) then return end
+
 	if GetConVar("spd_enabled"):GetInt() == 0 then return end
-	if ent:GetClass() ~= "prop_physics" then return end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
 		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
