@@ -7,13 +7,16 @@ local function spdEntityRemoved(ent)
 end
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
+local immuneEntities = {
+}
+
 local function spdEntityTakeDamage(ent, dmg)
 	local entOwner = ent:CPPIGetOwner()
 
 	if not IsValid( entOwner ) then return end
 	if not IsValid( ent ) then return end
 	if GetConVar("spd_enabled"):GetInt() == 0 then return end
-	if ent:GetClass() ~= "prop_physics" then return end
+	if rawget( immuneEntities, ent:GetClass() ) then return end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
 		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
