@@ -58,7 +58,10 @@ local cvarsString = cvars.String
 local constraintRemoveAll = constraint.RemoveAll
 local entsCreate = ents.Create
 
+
 local tostring = tostring
+local rawget = rawget
+local rawset = rawset
 local mathRandom = math.random
 local mathClamp = math.Clamp
 
