@@ -7,8 +7,7 @@ local function spdEntityRemoved(ent)
 end
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
-local immuneEntities = {
-}
+local immuneEntities = {}
 
 local function spdEntityTakeDamage(ent, dmg)
 	local entOwner = ent:CPPIGetOwner()
