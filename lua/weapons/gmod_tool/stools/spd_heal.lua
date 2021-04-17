@@ -40,7 +40,7 @@ function TOOL:LeftClick(trace)
 	
 	end
 	
-	if IsValid(ent) and ent:GetClass() == "prop_physics" then
+	if IsValid(ent) then
 	
 		spdHealEffect(ent)
 	

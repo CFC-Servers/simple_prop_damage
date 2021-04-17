@@ -40,13 +40,11 @@ function TOOL:LeftClick(trace)
 	
 	end
 	
-	if IsValid(ent) and ent:GetClass() == "prop_physics" then
+	if IsValid(ent) then
 		
 		spdDisableEffect(ent)
 		
-		if CLIENT then
-			return true
-		end
+		if CLIENT then return true end
 	
 		spdDisable(ent)
 		
@@ -76,7 +74,7 @@ function TOOL:RightClick(trace)
 	
 	end
 	
-	if IsValid(ent) and ent:GetClass() == "prop_physics" then
+	if IsValid(ent) then
 		
 		spdEnableEffect(ent)
 		
