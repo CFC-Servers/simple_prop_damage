@@ -9,44 +9,94 @@ hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
 local immuneEntities = {}
 
-local function spdEntityTakeDamage(ent, dmg)
-	local entOwner = ent:CPPIGetOwner()
+-- convars
+local spdEnabled = GetConVar( "spd_enabled" ):GetBool()
 
-	if not IsValid( entOwner ) then return end
+local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
+local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
+local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
+local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
+
+local frozenModifier = GetConVar( "spd_frozenmodifier" ):GetFloat()
+local propHealth = GetConVar( "spd_prophealth" ):GetInt()
+
+local spdColor = GetConVar( "spd_color" ):GetBool()
+local colorFadeR = GetConVar( "spd_colorfade_r" ):GetInt()
+local colorFadeG = GetConVar( "spd_colorfade_g" ):GetInt()
+local colorFadeB = GetConVar( "spd_colorfade_b" ):GetInt()
+
+local unfreezeThreshold = GetConVar( "spd_unfreeze_threshold" ):GetFloat()
+local removeConstraintsThreshold = GetConVar( "spd_removeconstraints_threshold" ):GetFloat()
+
+local spdEffects = GetConVar( "spd_effects" ):GetBool()
+local spdEffect = cvars.String( "spd_effect" )
+local spdEffect2 = cvars.String( "spd_effect2" )
+local spdExplosionEffect = cvars.String( "spd_explosion_effect" )
+
+local spdUnfreeze = GetConVar( "spd_unfreeze" ):GetBool()
+local spdRemoveConstraints = GetConVar( "spd_removeconstraints" ):GetBool()
+local spdExplosion = GetConVar( "spd_explosion" ):GetBool()
+local spdDebris = GetConVar( "spd_debris" ):GetBool()
+
+local healthMax = GetConVar( "spd_health_max" ):GetInt()
+local healthWeightRatio = GetConVar( "spd_health_weightratio" ):GetFloat()
+local healthVolumeRatio = GetConVar( "spd_health_volumeratio" ):GetFloat()
+
+local TickInterval = engine.TickInterval()
+
+local IsValid = IsValid
+local GetConVar = GetConVar
+local SafeRemoveEntity = SafeRemoveEntity
+local Lerp = Lerp
+local Color = Color
+local Vector = Vector
+local EffectData = EffectData
+
+local hookRun = hook.Run
+local utilEffect = util.Effect
+local cvarsString = cvars.String
+local constraintRemoveAll = constraint.RemoveAll
+local entsCreate = ents.Create
+
+local tostring = tostring
+local mathRandom = math.random
+local mathClamp = math.Clamp
+
+local DMG_CRUSH = DMG_CRUSH
+local DMG_BULLET = DMG_BULLET
+local DMG_BLAST = DMG_BLAST
+local DMG_CLUB = DMG_CLUB
+local COLLISION_GROUP_WORLD = COLLISION_GROUP_WORLD
+local SOLID_VPHYSICS = SOLID_VPHYSICS
+
+local function spdEntityTakeDamage(ent, dmg)
+	if not spdEnabled then return end
+
 	if not IsValid( ent ) then return end
 	if ent.spdDisabled then return end
-	if GetConVar("spd_enabled"):GetInt() == 0 then return end
+
+	local entOwner = ent:CPPIGetOwner()
+	if not IsValid( entOwner ) then return end
+
 	if rawget( immuneEntities, ent:GetClass() ) then return end
 
 	if dmg:IsDamageType( DMG_CRUSH ) then
-		local physicsDamage = GetConVar( "spd_physicsdamage" ):GetFloat()
-
 		if physicsDamage == 0 then return end
-
 		dmg:ScaleDamage( physicsDamage )
 	end
 
 	if dmg:IsDamageType( DMG_BULLET ) then
-		local bulletDamage = GetConVar( "spd_bulletdamage" ):GetFloat()
-
 		if bulletDamage == 0 then return end
-
 		dmg:ScaleDamage( bulletDamage )
 	end
 
 	if dmg:IsDamageType( DMG_BLAST ) then
-		local explosionDamage = GetConVar("spd_explosiondamage"):GetFloat()
-
 		if explosionDamage == 0 then return end
-
 		dmg:ScaleDamage( explosionDamage )
 	end
 
 	if dmg:IsDamageType( DMG_CLUB ) then
-		local meleeDamage = GetConVar("spd_meleedamage"):GetFloat()
-
 		if meleeDamage == 0 then return end
-
 		dmg:ScaleDamage( meleeDamage )
 	end
 
@@ -56,136 +106,117 @@ local function spdEntityTakeDamage(ent, dmg)
 	if not IsValid( entPhysObj ) then return end
 
 	if entPhysObj:IsAsleep() then
-		dmg:ScaleDamage( GetConVar("spd_frozenmodifier"):GetFloat() )
+		dmg:ScaleDamage( frozenModifier )
 	end
 
-	local shouldDamage = hook.Run( "SPDEntityTakeDamage", ent, dmg )
+	local shouldDamage = hookRun( "SPDEntityTakeDamage", ent, dmg )
 	if shouldDamage == false then return end
 
-	if spd[entIndex] == nil and ent:Health() == 0 then
+	local spdForEnt = rawget( spd, entIndex )
 
-		local spdHealth = spdGetMaxHealth(ent)
+	if spdForEnt == nil and ent:Health() == 0 then
+		local spdHealth = spdGetMaxHealth( ent )
 
-		spd[entIndex] = spdHealth
-		coltbl[entIndex] = ent:GetColor()
+		rawset( spd, entIndex, spdHealth )
+		spdForEnt = spdHealth
 
+		rawset( coltbl, entIndex, ent:GetColor() )
 	end
 
-	if spd[entIndex] then
-
-		spd[entIndex] = spd[entIndex] - dmg:GetDamage() / GetConVar("spd_prophealth"):GetInt()
+	if spdForEnt then
+		local newHealth = spdForEnt - dmg:GetDamage() / propHealth
+		rawset( spd, entIndex, newHealth )
 
 		local spdMaxHealth = spdGetMaxHealth(ent)
 
-		if GetConVar("spd_color"):GetInt() ~= 0 then
+		if spdColor then
 
-			local entHealthPercent = spd[entIndex] / spdMaxHealth
-			local entR = coltbl[entIndex].r
-			local entG = coltbl[entIndex].g
-			local entB = coltbl[entIndex].b
-			local fadeR = GetConVar("spd_colorfade_r"):GetInt()
-			local fadeG = GetConVar("spd_colorfade_g"):GetInt()
-			local fadeB = GetConVar("spd_colorfade_b"):GetInt()
-			local newR = Lerp(entHealthPercent, fadeR, entR)
-			local newG = Lerp(entHealthPercent, fadeG, entG)
-			local newB = Lerp(entHealthPercent, fadeB, entB)
-			local alpha = coltbl[entIndex].a
-			local color = Color(newR, newG, newB, alpha)
+			local entCol = rawget( coltbl, entIndex )
 
-			ent:SetColor(color)
+			local entHealthPercent = newHealth / spdMaxHealth
+			local entR = rawget( entCol, "r" )
+			local entG = rawget( entCol, "g" )
+			local entB = rawget( entCol, "b" )
+			local entA = rawget( entCol, "a" )
+			local newR = Lerp( entHealthPercent, colorFadeR, entR )
+			local newG = Lerp( entHealthPercent, colorFadeG, entG )
+			local newB = Lerp( entHealthPercent, colorFadeB, entB )
+			local color = Color( newR, newG, newB, entA )
 
+			ent:SetColor( color )
 		end
 
-		if spd[entIndex] < spdMaxHealth * GetConVar("spd_unfreeze_threshold"):GetFloat() then
+		if newHealth < spdMaxHealth * unfreezeThreshold then
 
-			if GetConVar("spd_effects"):GetInt() ~= 0 then
-
+			if spdEffects then
 				local effect = EffectData()
 				local dmgPos = dmg:GetDamagePosition()
-				effect:SetStart(dmgPos)
-				effect:SetOrigin(dmgPos)
-				util.Effect(cvars.String("spd_effect"), effect)
-
+				effect:SetStart( dmgPos )
+				effect:SetOrigin( dmgPos )
+				utilEffect(spdEffecet, effect)
 			end
 
-			if GetConVar("spd_unfreeze"):GetInt() ~= 0 then
-
+			if spdUnfreeze then
 				entPhysObj:EnableMotion(true)
-
 			end
 
 		end
 
-		if spd[entIndex] < spdMaxHealth * GetConVar("spd_removeconstraints_threshold"):GetFloat() then
+		if newHealth < spdMaxHealth * removeConstraintsThreshold then
 
-			if GetConVar("spd_effects"):GetInt() ~= 0 then
-
+			if spdEffects then
 				local effect = EffectData()
 				local dmgPos = dmg:GetDamagePosition()
 				effect:SetStart(dmgPos)
 				effect:SetOrigin(dmgPos)
-				util.Effect(cvars.String("spd_effect2"), effect)
-
+				utilEffect(spdEffect2, effect)
 			end
 
-			if GetConVarNumber("spd_removeconstraints") ~= 0 then
-
-				constraint.RemoveAll(ent)
-
-			end
-
+			if spdRemoveConstraints then constraintRemoveAll(ent) end
 		end
 
-		if spd[entIndex] <= 0 then
-
-			if GetConVar("spd_explosion"):GetFloat() ~= 0 then
-
+		if newHealth <= 0 then
+			if spdExplosion then
 				local effect = EffectData()
 				local entPos = ent:WorldSpaceCenter()
 				effect:SetStart(entPos)
 				effect:SetOrigin(entPos)
-				util.Effect(cvars.String("spd_explosion_effect"), effect)
-
+				utilEffect(spdExplosionEffect, effect)
 			end
 
-			spdDebris(ent)
-
-			SafeRemoveEntity(ent)
-
+			spdDebris( ent )
+			SafeRemoveEntity( ent )
 		end
 
 	end
 
 end
 
-hook.Add("EntityTakeDamage", "spdEntityTakeDamageHook", spdEntityTakeDamage)
+hook.Add( "EntityTakeDamage", "spdEntityTakeDamageHook", spdEntityTakeDamage )
 
-function spdDebris(ent)
+function spdDebris( ent )
 
-	if GetConVar("spd_debris"):GetInt() == 0 then
-		return
-	end
+	if not spdDebris then return end
 
-	if IsValid(ent) and not ent.spdDestroyed then
-
+	if IsValid( ent ) and not rawget( ent, "spdDestroyed" ) then
 		ent.spdDestroyed = true
 
-		local debris = ents.Create("base_gmodentity")
-		local mat = "debris/debris" .. tostring(math.random(1, 4))
+		local debris = entsCreate( "base_gmodentity" )
+		local mat = "debris/debris" .. tostring( mathRandom( 1, 4 ) )
 
-		debris:SetPos(ent:GetPos())
-		debris:SetAngles(ent:GetAngles())
-		debris:SetModel(ent:GetModel())
-		debris:SetMaterial(mat, false)
-		debris:SetCollisionGroup(COLLISION_GROUP_WORLD)
-		debris:PhysicsInit(SOLID_VPHYSICS)
+		debris:SetPos( ent:GetPos() )
+		debris:SetAngles( ent:GetAngles() )
+		debris:SetModel( ent:GetModel() )
+		debris:SetMaterial( mat, false )
+		debris:SetCollisionGroup( COLLISION_GROUP_WORLD )
+		debris:PhysicsInit( SOLID_VPHYSICS )
 
 		local physobj = debris:GetPhysicsObject()
 		--local force = spdGetMaxHealth(ent) * 4
 		local force = 1000
 
-		physobj:AddVelocity(Vector(math.random(-force, force), math.random(-force, force), math.random(-force, force)))
-		physobj:AddAngleVelocity(Vector(math.random(-force, force), math.random(-force, force), math.random(-force, force)))
+		physobj:AddVelocity(Vector(mathRandom(-force, force), mathRandom(-force, force), mathRandom(-force, force)))
+		physobj:AddAngleVelocity(Vector(mathRandom(-force, force), mathRandom(-force, force), mathRandom(-force, force)))
 
 		timer.Simple(10, function()
 
@@ -196,73 +227,54 @@ function spdDebris(ent)
 				effect:SetStart(debrisPos)
 				effect:SetOrigin(debrisPos)
 				effect:SetEntity(debris)
-				util.Effect("entity_remove", effect)
+				utilEffect("entity_remove", effect)
 
 			end
 
-			timer.Simple(engine.TickInterval(), function()
-
+			timer.Simple(TickInterval, function()
 				SafeRemoveEntity(debris)
-
-			end)
-
-		end)
+			end )
+		end )
 
 	end
 
 end
 
 function spdGetColor(ent)
-
-	return coltbl[ent:EntIndex()]
-
+	return rawget( coltbl, ent:EntIndex() )
 end
 
 function spdEnable(ent)
-
 	if IsValid(ent) then
-
 		ent.spdDisabled = false
-
 	end
-
 end
 
 function spdDisable(ent)
-
 	ent.spdDisabled = nil
-
 end
 
 function spdClear(ent)
-
-	spd[ent:EntIndex()] = nil
-	coltbl[ent:EntIndex()] = nil
-
+	local entIndex = ent:EntIndex()
+	rawset( spd, entIndex, nil )
+	rawset( coltbl, entIndex, nil )
 end
 
 function spdGetHealth(ent)
-
-	return spd[ent:EntIndex()]
-
+	return rawget( spd, ent:EntIndex() )
 end
 
 function spdGetMaxHealth(ent)
-
 	local maxHealth = spdGetWeightHealth(ent) + spdGetVolumeHealth(ent)
-	local clampedHealth = math.Clamp( maxHealth, 0, GetConVar("spd_health_max"):GetInt() )
+	local clampedHealth = mathClamp( maxHealth, 0, healthMax )
 
 	return clampedHealth
 end
 
 function spdGetWeightHealth(ent)
-
-	return ent:GetPhysicsObject():GetMass() * GetConVar("spd_health_weightratio"):GetFloat()
-
+	return ent:GetPhysicsObject():GetMass() * healthWeightRatio
 end
 
 function spdGetVolumeHealth(ent)
-
-	return ent:GetPhysicsObject():GetVolume() / 500 * GetConVar("spd_health_volumeratio"):GetFloat()
-
+	return ent:GetPhysicsObject():GetVolume() / 500 * healthVolumeRatio
 end
