@@ -24,7 +24,7 @@ function TOOL:Think()
 	local owner = self:GetOwner()
 	local ent = owner:GetEyeTrace().Entity
 	
-	if not IsValid(ent) or not ent:GetClass() == "prop_physics" then
+	if not IsValid(ent) then
 		return
 	end
 	
