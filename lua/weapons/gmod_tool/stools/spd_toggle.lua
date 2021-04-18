@@ -30,10 +30,7 @@ function TOOL:LeftClick(trace)
 	if adminOnly and owner:IsAdmin() == false then
 		
 		if CLIENT then
-		
 			notification.AddLegacy("This tool is restricted to admins!" , NOTIFY_ERROR, 5)
-			return false
-			
 		end
 		
 		return false
