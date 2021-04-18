@@ -14,6 +14,7 @@ local function spdEntityTakeDamage(ent, dmg)
 
 	if not IsValid( entOwner ) then return end
 	if not IsValid( ent ) then return end
+	if ent.spdDisabled then return end
 	if GetConVar("spd_enabled"):GetInt() == 0 then return end
 	if rawget( immuneEntities, ent:GetClass() ) then return end
 
