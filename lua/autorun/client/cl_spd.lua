@@ -1,3 +1,11 @@
+if not ConVarExists("spd_tool_toggle_adminonly") then
+    CreateConVar("spd_tool_toggle_adminonly", 1, FCVAR_ARCHIVE)
+end
+
+if not ConVarExists("spd_tool_heal_adminonly") then
+    CreateConVar("spd_tool_heal_adminonly", 1, FCVAR_ARCHIVE)
+end
+
 local function PopulateSPDMainPanel(panel)
 
 	panel:AddControl("ComboBox", {
