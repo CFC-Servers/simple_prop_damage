@@ -7,7 +7,7 @@ e2function void entity:spdAdmDisable()
     this.spdDisabled = 1
 end
 
-e2function void entity:spdAdmEnable()
+e2function void entity:spdAdminEnable()
     if not isValid( this ) then return end
     if not self.player:IsAdmin() then return end
     
