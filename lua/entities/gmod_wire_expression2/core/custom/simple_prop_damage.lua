@@ -1,6 +1,6 @@
 E2Lib.RegisterExtension( "simple_prop_damage", true )
 
-e2function void entity:spdAdmDisable()
+e2function void entity:spdAdminDisable()
     if not isValid( this ) then return end
     if not self.player:IsAdmin() then return end
     
