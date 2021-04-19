@@ -228,7 +228,7 @@ function spdDebris( ent )
 
     if not spdDebrisEnabled then return end
 
-    if IsValid( ent ) and not rawget( ent, "spdDestroyed" ) then
+    if IsValid( ent ) and not ent.spdDestroyed then
         ent.spdDestroyed = true
 
         local debris = entsCreate( "base_gmodentity" )
