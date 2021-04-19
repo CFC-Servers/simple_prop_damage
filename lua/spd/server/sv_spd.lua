@@ -308,5 +308,7 @@ function spdGetWeightHealth(ent)
 end
 
 function spdGetVolumeHealth(ent)
-    return ent:GetPhysicsObject():GetVolume() / 500 * healthVolumeRatio
+    local phys = ent:GetPhysicsObject()
+    if not IsValid( phys ) then return 0 end
+    return phys:GetVolume() / 500 * healthVolumeRatio
 end
