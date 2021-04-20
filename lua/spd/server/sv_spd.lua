@@ -37,7 +37,14 @@ local function spdEntityRemoved(ent)
 end
 hook.Add("EntityRemoved", "spdEntityRemovedHook", spdEntityRemoved)
 
-local immuneEntities = {}
+local immuneEntities = {
+    -- SimfPhys
+    gmod_sent_vehicle_fphysics_wheel = true,
+    gmod_sent_vehicle_fphysics_base = true,
+    gmod_sent_vehicle_fphysics_attachment = true,
+    prop_vehicle_prisoner_pod = true,
+    phys_spring = true
+}
 
 local spdEnabled
 local physicsDamage
