@@ -4,12 +4,12 @@ e2function void entity:spdAdminDisable()
     if not IsValid( this ) then return end
     if not self.player:IsAdmin() then return end
     
-    this.spdDisabled = 1
+    this.spdDisabled = true
 end
 
 e2function void entity:spdAdminEnable()
     if not IsValid( this ) then return end
     if not self.player:IsAdmin() then return end
     
-    this.spdDisabled = 0
+    this.spdDisabled = false
 end
