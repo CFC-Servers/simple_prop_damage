@@ -115,6 +115,9 @@ local function spdEntityTakeDamage(ent, dmg)
     local entOwner = ent:CPPIGetOwner()
     if not IsValid( entOwner ) then return end
 
+    if ent:IsNPC() then return end
+    if ent:IsNextBot() then return end
+
     if rawget( immuneEntities, ent:GetClass() ) then return end
 
     if dmg:IsDamageType( DMG_CRUSH ) then
