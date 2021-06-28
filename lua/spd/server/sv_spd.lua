@@ -320,5 +320,9 @@ end
 function spdGetVolumeHealth(ent)
     local phys = ent:GetPhysicsObject()
     if not IsValid( phys ) then return 0 end
-    return phys:GetVolume() / 500 * healthVolumeRatio
+
+    local volume = phys:GetVolume()
+    if not volume then return 0 end
+
+    return volume / 500 * healthVolumeRatio
 end
