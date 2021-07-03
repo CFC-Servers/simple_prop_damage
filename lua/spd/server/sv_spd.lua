@@ -45,7 +45,7 @@ local immuneEntities = {
     prop_vehicle_prisoner_pod = true,
     phys_spring = true,
     m9k_nervegasnade = true,
-    sammyservers_textscreen = true,
+    sammyservers_textscreen = true
 }
 
 local spdEnabled
