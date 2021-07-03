@@ -44,7 +44,7 @@ local immuneEntities = {
     gmod_sent_vehicle_fphysics_attachment = true,
     prop_vehicle_prisoner_pod = true,
     phys_spring = true,
-    m9k_nervegasnade = true,
+    m9k_nervegasnade = true
 }
 
 local spdEnabled
