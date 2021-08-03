@@ -72,6 +72,7 @@ local spdDebrisEnabled
 local healthMax
 local healthWeightRatio
 local healthVolumeRatio
+local healthMaxDestructible
 
 function SPDUpdateConvars()
     spdEnabled = GetConVar( "spd_enabled" ):GetBool()
@@ -105,6 +106,7 @@ function SPDUpdateConvars()
     healthMax = GetConVar( "spd_health_max" ):GetInt()
     healthWeightRatio = GetConVar( "spd_health_weightratio" ):GetFloat()
     healthVolumeRatio = GetConVar( "spd_health_volumeratio" ):GetFloat()
+    healthMaxDestructible = GetConVar( "spd_health_max_destructible" ):GetFloat()
 end
 hook.Add( "Initialize", "SPDConvarSetup", SPDUpdateConvars )
 
@@ -155,8 +157,9 @@ local function spdEntityTakeDamage(ent, dmg)
     if shouldDamage == false then return end
 
     local spdForEnt = rawget( spd, entIndex )
+    local entHealth = ent:Health()
 
-    if spdForEnt == nil and ent:Health() == 0 then
+    if spdForEnt == nil and ( entHealth == 0 or entHealth > healthMaxDestructible ) then
         local spdHealth = spdGetMaxHealth( ent )
 
         rawset( spd, entIndex, spdHealth )
@@ -165,73 +168,71 @@ local function spdEntityTakeDamage(ent, dmg)
         rawset( coltbl, entIndex, ent:GetColor() )
     end
 
-    if spdForEnt then
-        local newHealth = spdForEnt - dmg:GetDamage() / propHealth
-        rawset( spd, entIndex, newHealth )
+    if not spdForEnt then return end
 
-        local spdMaxHealth = spdGetMaxHealth(ent)
+    local newHealth = spdForEnt - dmg:GetDamage() / propHealth
+    rawset( spd, entIndex, newHealth )
 
-        if spdColor then
+    local spdMaxHealth = spdGetMaxHealth(ent)
 
-            local entCol = rawget( coltbl, entIndex )
+    if spdColor then
 
-            local entHealthPercent = newHealth / spdMaxHealth
-            local entR = rawget( entCol, "r" )
-            local entG = rawget( entCol, "g" )
-            local entB = rawget( entCol, "b" )
-            local entA = rawget( entCol, "a" )
-            local newR = Lerp( entHealthPercent, colorFadeR, entR )
-            local newG = Lerp( entHealthPercent, colorFadeG, entG )
-            local newB = Lerp( entHealthPercent, colorFadeB, entB )
-            local color = Color( newR, newG, newB, entA )
+        local entCol = rawget( coltbl, entIndex )
 
-            ent:SetColor( color )
+        local entHealthPercent = newHealth / spdMaxHealth
+        local entR = rawget( entCol, "r" )
+        local entG = rawget( entCol, "g" )
+        local entB = rawget( entCol, "b" )
+        local entA = rawget( entCol, "a" )
+        local newR = Lerp( entHealthPercent, colorFadeR, entR )
+        local newG = Lerp( entHealthPercent, colorFadeG, entG )
+        local newB = Lerp( entHealthPercent, colorFadeB, entB )
+        local color = Color( newR, newG, newB, entA )
+
+        ent:SetColor( color )
+    end
+
+    if newHealth < spdMaxHealth * unfreezeThreshold then
+
+        if spdEffects then
+            local effect = EffectData()
+            local dmgPos = dmg:GetDamagePosition()
+            effect:SetStart( dmgPos )
+            effect:SetOrigin( dmgPos )
+            utilEffect(spdEffect, effect)
         end
 
-        if newHealth < spdMaxHealth * unfreezeThreshold then
-
-            if spdEffects then
-                local effect = EffectData()
-                local dmgPos = dmg:GetDamagePosition()
-                effect:SetStart( dmgPos )
-                effect:SetOrigin( dmgPos )
-                utilEffect(spdEffect, effect)
-            end
-
-            if spdUnfreeze then
-                entPhysObj:EnableMotion(true)
-            end
-
-        end
-
-        if newHealth < spdMaxHealth * removeConstraintsThreshold then
-
-            if spdEffects then
-                local effect = EffectData()
-                local dmgPos = dmg:GetDamagePosition()
-                effect:SetStart(dmgPos)
-                effect:SetOrigin(dmgPos)
-                utilEffect(spdEffect2, effect)
-            end
-
-            if spdRemoveConstraints then constraintRemoveAll(ent) end
-        end
-
-        if newHealth <= 0 then
-            if spdExplosion then
-                local effect = EffectData()
-                local entPos = ent:WorldSpaceCenter()
-                effect:SetStart(entPos)
-                effect:SetOrigin(entPos)
-                utilEffect(spdExplosionEffect, effect)
-            end
-
-            spdDebris( ent )
-            SafeRemoveEntity( ent )
+        if spdUnfreeze then
+            entPhysObj:EnableMotion(true)
         end
 
     end
 
+    if newHealth < spdMaxHealth * removeConstraintsThreshold then
+
+        if spdEffects then
+            local effect = EffectData()
+            local dmgPos = dmg:GetDamagePosition()
+            effect:SetStart(dmgPos)
+            effect:SetOrigin(dmgPos)
+            utilEffect(spdEffect2, effect)
+        end
+
+        if spdRemoveConstraints then constraintRemoveAll(ent) end
+    end
+
+    if newHealth <= 0 then
+        if spdExplosion then
+            local effect = EffectData()
+            local entPos = ent:WorldSpaceCenter()
+            effect:SetStart(entPos)
+            effect:SetOrigin(entPos)
+            utilEffect(spdExplosionEffect, effect)
+        end
+
+        spdDebris( ent )
+        SafeRemoveEntity( ent )
+    end
 end
 
 hook.Add( "EntityTakeDamage", "spdEntityTakeDamageHook", spdEntityTakeDamage )

@@ -38,6 +38,7 @@ local cvartbl = cvartbl or {
     spd_meleedamage = 1,
     spd_frozenmodifier = 0.5,
     spd_health_max = 75000,
+    spd_health_max_destructible = 100,
 }
 
 for cvar, default in pairs( cvartbl ) do
